@@ -1,101 +1,167 @@
-import Image from "next/image";
+'use client'
 
-export default function Home() {
+import React, { useState, useEffect } from 'react';
+import SpaceBackground from '@/components/SpaceBackground';
+import { motion, AnimatePresence } from 'framer-motion';
+import { IconHourglass } from '@tabler/icons-react';
+import { Langar } from 'next/font/google';
+
+const langar = Langar({ weight: '400', style: 'normal', subsets: ['latin'] });
+
+const AnimeProgressTracker = () => {
+  const [timeLeft, setTimeLeft] = useState('');
+  const [progress, setProgress] = useState(0);
+  const [currentQuote, setCurrentQuote] = useState(0);
+
+  const animeQuotes = [
+    {
+      text: "A lesson without pain is meaningless.",
+      author: "Fullmetal Alchemist: Brotherhood"
+    },
+    {
+      text: "Power comes in response to a need, not a desire.",
+      author: "Dragon Ball Z"
+    },
+    {
+      text: "Fear is not evil. It tells you what your weakness is.",
+      author: "Fairy Tail"
+    }
+  ];
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const endOfYear = new Date('2025-12-31T23:59:59');
+      const now = new Date();
+      const difference = endOfYear.getTime() - now.getTime();
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+      setProgress((1 - difference / (endOfYear.getTime() - new Date('2025-01-01T00:00:00').getTime())) * 100);
+    };
+
+    calculateTimeLeft();
+    const interval = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const quoteInterval = setInterval(() => {
+      setCurrentQuote((prev) => (prev + 1) % animeQuotes.length);
+    }, 10000);
+    return () => clearInterval(quoteInterval);
+  }, []);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="relative w-full min-h-screen bg-gradient-to-b from-black via-slate-900 to-blue-950 text-white">
+      <SpaceBackground />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* Animated particles in background */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-blue-400 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              opacity: 0.4
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-4">
+        <motion.h1
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
+          className="pointer-events-none text-center font-extrabold leading-none mb-8"
+        >
+          <span className={`${langar.className} block text-6xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-b from-white to-black animate-gradient`}>
+            2025: The Final Arc
+          </span>
+        </motion.h1>
+
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+          className="flex items-center justify-center mb-12 bg-gradient-to-r from-blue-950/30 via-cyan-900/20 to-blue-950/30 rounded-full p-6 shadow-lg backdrop-blur-md border border-blue-500/20"
+        >
+          <IconHourglass className="w-8 h-8 md:w-12 md:h-12 mr-4 animate-pulse text-cyan-400" stroke={1.5} />
+          <span className="text-2xl md:text-4xl  font-bold text-gray-300">
+            {timeLeft}
+          </span>
+        </motion.div>
+
+        <div className="w-full max-w-2xl mb-12 relative">
+          <div className="h-8 bg-blue-950/50 rounded-full overflow-hidden border border-blue-500/20 backdrop-blur-md shadow-inner">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 1, ease: "easeInOut" }}
+              className="h-full relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-500 animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 opacity-30 animate-shimmer" />
+            </motion.div>
+          </div>
+          <div className="mt-2 text-center font-bold">
+            <span className="text-lg text-cyan-300">
+              Power Level: {progress.toFixed(2)}%
+            </span>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentQuote}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+            className="text-center max-w-2xl bg-gradient-to-r from-blue-950/30 via-cyan-900/20 to-blue-950/30 rounded-lg p-8 backdrop-blur-md border border-blue-500/20 shadow-lg"
+          >
+            <p className="text-xl italic mb-2 text-white">"{animeQuotes[currentQuote].text}"</p>
+            <p className="text-sm text-cyan-300">
+              - {animeQuotes[currentQuote].author}
+            </p>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <style jsx global>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        @keyframes gradient {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+        .animate-gradient {
+          background-size: 200% 200%;
+          animation: gradient 15s ease infinite;
+        }
+        .animate-shimmer {
+          animation: shimmer 2s linear infinite;
+        }
+      `}</style>
     </div>
   );
-}
+};
+
+export default AnimeProgressTracker;
