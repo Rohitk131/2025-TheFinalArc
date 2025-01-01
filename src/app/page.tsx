@@ -3,7 +3,21 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, Sparkles, Hourglass } from "lucide-react";
-const FloatingElement = ({ delay, children }) => (
+
+interface AnimeQuote {
+  text: string;
+  author: string;
+}
+
+interface FloatingElementProps {
+  delay: number;
+  children: React.ReactNode;
+}
+
+const FloatingElement: React.FC<FloatingElementProps> = ({
+  delay,
+  children,
+}) => (
   <motion.div
     animate={{
       y: [-10, 10, -10],
@@ -19,13 +33,14 @@ const FloatingElement = ({ delay, children }) => (
     {children}
   </motion.div>
 );
-const AnimeProgressTracker = () => {
-  const [timeLeft, setTimeLeft] = useState("");
-  const [progress, setProgress] = useState(0);
-  const [currentQuote, setCurrentQuote] = useState(0);
-  const [animateNumber, setAnimateNumber] = useState(false);
 
-  const animeQuotes = [
+const AnimeProgressTracker: React.FC = () => {
+  const [timeLeft, setTimeLeft] = useState<string>("");
+  const [progress, setProgress] = useState<number>(0);
+  const [currentQuote, setCurrentQuote] = useState<number>(0);
+  const [animateNumber, setAnimateNumber] = useState<boolean>(false);
+
+  const animeQuotes: AnimeQuote[] = [
     {
       text: "A lesson without pain is meaningless.",
       author: "Fullmetal Alchemist: Brotherhood",
@@ -46,14 +61,23 @@ const AnimeProgressTracker = () => {
       const now = new Date();
       const difference = endOfYear.getTime() - now.getTime();
 
+      if (difference <= 0) {
+        setTimeLeft("0d 0h 0m 0s");
+        setProgress(100);
+        return;
+      }
+
       const days = Math.floor(difference / (1000 * 60 * 60 * 24));
       const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const minutes = Math.floor((difference / (1000 * 60)) % 60);
       const seconds = Math.floor((difference / 1000) % 60);
 
       setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
       setProgress(
-        (1 - difference / (endOfYear - new Date("2025-01-01").getTime())) * 100,
+        (1 -
+          difference /
+            (endOfYear.getTime() - new Date("2025-01-01").getTime())) *
+          100,
       );
       setAnimateNumber((prev) => !prev);
     };
@@ -68,12 +92,11 @@ const AnimeProgressTracker = () => {
       setCurrentQuote((prev) => (prev + 1) % animeQuotes.length);
     }, 10000);
     return () => clearInterval(quoteInterval);
-  }, []);
+  }, [animeQuotes.length]);
 
   return (
     <div className="relative w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent animate-pulse" />
-
       <div className="absolute inset-0 bg-grid-white/5 bg-grid-8" />
       <div className="absolute inset-0 overflow-hidden">
         <FloatingElement delay={0}>
@@ -107,7 +130,7 @@ const AnimeProgressTracker = () => {
             >
               <Clock className="w-8 h-8 animate-pulse" />
               <motion.span
-                key={animateNumber}
+                key={animateNumber.toString()}
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 className="font-mono text-2xl tracking-wider"
@@ -124,7 +147,7 @@ const AnimeProgressTracker = () => {
             <div className="relative">
               <div className="h-3 bg-white/5 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
                 <motion.div
-                  initial={{ width: 0 }}
+                  initial={{ width: "0%" }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 1 }}
                   className="h-full bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 relative"
