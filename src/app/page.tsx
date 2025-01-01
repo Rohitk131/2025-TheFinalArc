@@ -1,36 +1,48 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import SpaceBackground from '@/components/SpaceBackground';
-import { motion, AnimatePresence } from 'framer-motion';
-import { IconHourglass } from '@tabler/icons-react';
-import { Langar } from 'next/font/google';
-
-const langar = Langar({ weight: '400', style: 'normal', subsets: ['latin'] });
-
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Clock, Sparkles, Hourglass } from "lucide-react";
+const FloatingElement = ({ delay, children }) => (
+  <motion.div
+    animate={{
+      y: [-10, 10, -10],
+      rotate: [-2, 2, -2],
+    }}
+    transition={{
+      duration: 6,
+      delay,
+      repeat: Infinity,
+      ease: "easeInOut",
+    }}
+  >
+    {children}
+  </motion.div>
+);
 const AnimeProgressTracker = () => {
-  const [timeLeft, setTimeLeft] = useState('');
+  const [timeLeft, setTimeLeft] = useState("");
   const [progress, setProgress] = useState(0);
   const [currentQuote, setCurrentQuote] = useState(0);
+  const [animateNumber, setAnimateNumber] = useState(false);
 
   const animeQuotes = [
     {
       text: "A lesson without pain is meaningless.",
-      author: "Fullmetal Alchemist: Brotherhood"
+      author: "Fullmetal Alchemist: Brotherhood",
     },
     {
       text: "Power comes in response to a need, not a desire.",
-      author: "Dragon Ball Z"
+      author: "Dragon Ball Z",
     },
     {
       text: "Fear is not evil. It tells you what your weakness is.",
-      author: "Fairy Tail"
-    }
+      author: "Fairy Tail",
+    },
   ];
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const endOfYear = new Date('2025-12-31T23:59:59');
+      const endOfYear = new Date("2025-12-31T23:59:59");
       const now = new Date();
       const difference = endOfYear.getTime() - now.getTime();
 
@@ -40,7 +52,10 @@ const AnimeProgressTracker = () => {
       const seconds = Math.floor((difference / 1000) % 60);
 
       setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-      setProgress((1 - difference / (endOfYear.getTime() - new Date('2025-01-01T00:00:00').getTime())) * 100);
+      setProgress(
+        (1 - difference / (endOfYear - new Date("2025-01-01").getTime())) * 100,
+      );
+      setAnimateNumber((prev) => !prev);
     };
 
     calculateTimeLeft();
@@ -56,110 +71,122 @@ const AnimeProgressTracker = () => {
   }, []);
 
   return (
-    <div className="relative w-full min-h-screen bg-gradient-to-b from-black via-slate-900 to-blue-950 text-white">
-      <SpaceBackground />
+    <div className="relative w-full min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 text-white flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent animate-pulse" />
 
-      {/* Animated particles in background */}
+      <div className="absolute inset-0 bg-grid-white/5 bg-grid-8" />
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-blue-400 rounded-full animate-float"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              opacity: 0.4
-            }}
-          />
-        ))}
+        <FloatingElement delay={0}>
+          <div className="absolute top-20 left-1/4 w-1 h-1 bg-blue-400 rounded-full blur-sm" />
+        </FloatingElement>
+        <FloatingElement delay={2}>
+          <div className="absolute bottom-40 right-1/3 w-2 h-2 bg-blue-300 rounded-full blur-sm" />
+        </FloatingElement>
+        <FloatingElement delay={4}>
+          <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-blue-500 rounded-full blur-sm" />
+        </FloatingElement>
       </div>
-
-      <div className="absolute inset-0 flex flex-col items-center justify-center z-10 px-4">
+      <div className="w-full max-w-2xl mx-auto px-6 py-12 space-y-16 z-10">
         <motion.h1
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          className="pointer-events-none text-center font-extrabold leading-none mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-5xl md:text-7xl font-bold text-center tracking-tight bg-gradient-to-r from-white via-blue-200 to-white bg-clip-text text-transparent"
         >
-          <span className={`${langar.className} block text-6xl md:text-8xl bg-clip-text text-transparent bg-gradient-to-b from-white to-black animate-gradient`}>
-            2025: The Final Arc
+          2025
+          <span className="block text-lg md:text-xl font-light mt-2 text-blue-300">
+            Your Story Awaits
           </span>
         </motion.h1>
 
-        <motion.div
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          className="flex items-center justify-center mb-12 bg-gradient-to-r from-blue-950/30 via-cyan-900/20 to-blue-950/30 rounded-full p-6 shadow-lg backdrop-blur-md border border-blue-500/20"
-        >
-          <IconHourglass className="w-8 h-8 md:w-12 md:h-12 mr-4 animate-pulse text-cyan-400" stroke={1.5} />
-          <span className="text-2xl md:text-4xl  font-bold text-gray-300">
-            {timeLeft}
-          </span>
-        </motion.div>
-
-        <div className="w-full max-w-2xl mb-12 relative">
-          <div className="h-8 bg-blue-950/50 rounded-full overflow-hidden border border-blue-500/20 backdrop-blur-md shadow-inner">
+        <div className="space-y-12">
+          <div className="flex flex-col items-center gap-4">
             <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 1, ease: "easeInOut" }}
-              className="h-full relative"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="flex items-center justify-center space-x-4 text-blue-300 bg-white/5 py-4 px-8 rounded-2xl backdrop-blur-sm border border-white/10 shadow-lg"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-500 animate-pulse" />
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 opacity-30 animate-shimmer" />
+              <Clock className="w-8 h-8 animate-pulse" />
+              <motion.span
+                key={animateNumber}
+                initial={{ y: 10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                className="font-mono text-2xl tracking-wider"
+              >
+                {timeLeft}
+              </motion.span>
             </motion.div>
-          </div>
-          <div className="mt-2 text-center font-bold">
-            <span className="text-lg text-cyan-300">
-              Power Level: {progress.toFixed(2)}%
+            <span className="text-blue-400/60 text-sm">
+              Time remaining in 2025
             </span>
+          </div>
+
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="h-3 bg-white/5 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 1 }}
+                  className="h-full bg-gradient-to-r from-blue-600 via-blue-400 to-blue-300 relative"
+                >
+                  <div className="absolute inset-0 bg-shine animate-shine" />
+                  <motion.div
+                    animate={{
+                      opacity: [0.4, 1, 0.4],
+                      scale: [1, 1.2, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                    }}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2"
+                  >
+                    <Sparkles className="w-5 h-5 text-white" />
+                  </motion.div>
+                </motion.div>
+              </div>
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -right-3 -top-3 bg-blue-500/20 p-2 rounded-full backdrop-blur-sm"
+              >
+                <Hourglass className="w-4 h-4 text-blue-300 animate-spin" />
+              </motion.div>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-blue-400 text-sm font-medium">
+                Progress
+              </span>
+              <motion.span
+                key={progress}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="text-blue-300 font-bold text-lg"
+              >
+                {progress.toFixed(1)}%
+              </motion.span>
+            </div>
           </div>
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQuote}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.5 }}
-            className="text-center max-w-2xl bg-gradient-to-r from-blue-950/30 via-cyan-900/20 to-blue-950/30 rounded-lg p-8 backdrop-blur-md border border-blue-500/20 shadow-lg"
+            className="text-center space-y-3 bg-white/5 p-8 rounded-2xl backdrop-blur-sm border border-white/10 shadow-lg"
           >
-            <p className="text-xl italic mb-2 text-white">"{animeQuotes[currentQuote].text}"</p>
-            <p className="text-sm text-cyan-300">
-              - {animeQuotes[currentQuote].author}
+            <p className="text-base md:text-lg text-blue-100 font-light leading-relaxed">
+              "{animeQuotes[currentQuote].text}"
+            </p>
+            <p className="text-sm text-blue-400 font-medium">
+              {animeQuotes[currentQuote].author}
             </p>
           </motion.div>
         </AnimatePresence>
       </div>
-
-      <style jsx global>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
-        }
-        @keyframes gradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        @keyframes shimmer {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        .animate-gradient {
-          background-size: 200% 200%;
-          animation: gradient 15s ease infinite;
-        }
-        .animate-shimmer {
-          animation: shimmer 2s linear infinite;
-        }
-      `}</style>
     </div>
   );
 };
