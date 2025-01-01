@@ -76,8 +76,8 @@ const AnimeProgressTracker: React.FC = () => {
       setProgress(
         (1 -
           difference /
-            (endOfYear.getTime() - new Date("2025-01-01").getTime())) *
-          100,
+          (endOfYear.getTime() - new Date("2025-01-01").getTime())) *
+        100,
       );
       setAnimateNumber((prev) => !prev);
     };
@@ -202,7 +202,7 @@ const AnimeProgressTracker: React.FC = () => {
             className="text-center space-y-3 bg-white/5 p-8 rounded-2xl backdrop-blur-sm border border-white/10 shadow-lg"
           >
             <p className="text-base md:text-lg text-blue-100 font-light leading-relaxed">
-              "{animeQuotes[currentQuote].text}"
+              {"\"" + animeQuotes[currentQuote].text + "\""}
             </p>
             <p className="text-sm text-blue-400 font-medium">
               {animeQuotes[currentQuote].author}
